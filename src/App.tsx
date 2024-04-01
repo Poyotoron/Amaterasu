@@ -1,52 +1,95 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
+import React, { useState } from "react";
 import { invoke } from "@tauri-apps/api/tauri";
 import "./App.css";
 
-function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+const keyImage = "./src/assets/key.png"
+const keyImagePressed = "./src/assets/key_light.png"
+const scratchImage = "./src/assets/scratch.png"
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-    setGreetMsg(await invoke("greet", { name }));
+const scratchAreaLeft = 0
+const scratchAreaTop = 0
+const scratchAreaWidth = 400
+const scratchAreaHeight = 400
+const scratchImageWidth = 300
+const scratchImageHeight = 300
+
+const keyAreaLeft = 400
+const keyAreaTop = 0
+const keyAreaWidth = 600
+const keyAreaHeight = 400
+const keyImageWidth = 80
+const keyImageHeight = 150
+
+function App() {
+  function createKeyStyle(keyNum: number) {
+    var index = keyNum / 2;
+    var isWhite = keyNum % 2 == 1;
+
+    return {
+      position: "absolute",
+      left: 20 + keyNum * keyImageWidth,
+      top: isWhite ? 50 : 225,
+      width: keyImageWidth,
+      height: keyImageHeight,
+    };
+  }
+
+  class Scratch extends React.Component {
+    render() {
+      return (
+        <img src={scratchImage} style={{ position: "absolute", left: 50, top: 50, width: scratchImageWidth, height: scratchImageHeight }} />
+      );
+    }
+  }
+
+  class ScratchArea extends React.Component {
+    render() {
+      return (
+        <div style={{ position: "absolute", left: scratchAreaLeft, top: scratchAreaTop }}>
+          <Scratch />
+        </div>
+      );
+    }
+  }
+
+  class Key extends React.Component<{ src: string, keyNum: number }> {
+    render() {
+      return (
+        <img src={this.props.src} style={createKeyStyle(this.props.keyNum) as React.CSSProperties} />
+      )
+    }
+  }
+
+  class Keys extends React.Component {
+    render() {
+      const keys = [];
+      for (var i = 0; i < 7; i++) {
+        keys.push(<Key src={keyImage} keyNum={i} />);
+      }
+
+      return (
+        <span>
+          {keys}
+        </span>
+      );
+    }
+  }
+
+  class KeyArea extends React.Component {
+    render() {
+      return (
+        <div style={{ position: "absolute", left: keyAreaLeft, top: keyAreaTop }}>
+          <Keys />
+        </div>
+      );
+    }
   }
 
   return (
-    <div className="container">
-      <h1>Welcome to Tauri!</h1>
-
-      <div className="row">
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
-
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-
-      <p>{greetMsg}</p>
-    </div>
+    // <h1>Maaaaa</h1>
+    <>
+      <ScratchArea /><KeyArea />
+    </>
   );
 }
 
