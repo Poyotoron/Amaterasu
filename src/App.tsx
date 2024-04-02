@@ -22,8 +22,8 @@ const keyImageWidth = 80
 const keyImageHeight = 150
 
 function App() {
-  // var keyStates = [false, false, false, false, false, false, false];
   const [keyStates, setKeyStates] = useState([false, false, false, false, false, false, false]);
+  const [scratchState, setScratchState] = useState(0.0);
 
   function createKeyStyle(keyNum: number) {
     var index = keyNum / 2;
@@ -41,7 +41,7 @@ function App() {
   class Scratch extends React.Component {
     render() {
       return (
-        <img src={scratchImage} style={{ position: "absolute", left: 50, top: 50, width: scratchImageWidth, height: scratchImageHeight }} />
+        <img src={scratchImage} style={{ position: "absolute", left: 50, top: 50, width: scratchImageWidth, height: scratchImageHeight, transform: `rotate(${-scratchState * 360}deg)` }} />
       );
     }
   }
@@ -94,24 +94,34 @@ function App() {
   }
 
   useEffect(() => {
-    let unlisten: any;
+    let listenButtonState: any;
+    let listenScratchState: any;
+
     async function f() {
-      unlisten = await listen("buttonState", event => {
+      listenButtonState = await listen("buttonState", event => {
         console.log(event.payload);
         setKeyStates(event.payload as boolean[]);
+      });
+
+      listenScratchState = await listen("scratchState", event => {
+        console.log(event.payload);
+        setScratchState(event.payload as number);
       });
     }
     f();
 
     return () => {
-      if (unlisten) {
-        unlisten();
+      if (listenButtonState) {
+        listenButtonState();
+      }
+
+      if (listenScratchState) {
+        listenScratchState();
       }
     }
   }, []);
 
   return (
-    // <h1>Maaaaa</h1>
     <>
       <ScratchArea /><KeyArea />
     </>
