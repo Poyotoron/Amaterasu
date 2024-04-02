@@ -52,6 +52,7 @@ fn main() {
                     .unwrap();
 
                     app_handle.emit_all("buttonState", &button_state).unwrap();
+                    app_handle.emit_all("scratchState", &axis_state[0]).unwrap();
 
                     std::thread::sleep(std::time::Duration::from_micros(100));
                 }
