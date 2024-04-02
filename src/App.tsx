@@ -5,14 +5,14 @@ import { listen } from "@tauri-apps/api/event";
 
 const keyImage = "./src/assets/key.png"
 const keyImagePressed = "./src/assets/key_light.png"
-const scratchImage = "./src/assets/scratch.svg"
+const scratchImage = "./src/assets/scratch.png"
 
 const scratchAreaLeft = 0
 const scratchAreaTop = 0
 const scratchAreaWidth = 400
 const scratchAreaHeight = 400
-const scratchImageWidth = 350
-const scratchImageHeight = 350
+const scratchImageWidth = 300
+const scratchImageHeight = 300
 
 const keyAreaLeft = 400
 const keyAreaTop = 0
@@ -41,7 +41,7 @@ function App() {
   class Scratch extends React.Component {
     render() {
       return (
-        <img src={scratchImage} style={{ position: "absolute", left: (scratchAreaWidth - scratchImageWidth) / 2, top: (scratchAreaHeight - scratchImageHeight) / 2, width: scratchImageWidth, height: scratchImageHeight, transform: `rotate(${-scratchState * 360}deg)` }} />
+        <img src={scratchImage} style={{ position: "absolute", left: 50, top: 50, width: scratchImageWidth, height: scratchImageHeight, transform: `rotate(${-scratchState * 360}deg)` }} />
       );
     }
   }
