@@ -3,9 +3,9 @@ import React, { useEffect, useState } from "react";
 import "./App.css";
 import { listen } from "@tauri-apps/api/event";
 
-const keyImage = "./src/assets/key.png"
-const keyImagePressed = "./src/assets/key_light.png"
-const scratchImage = "./src/assets/scratch.svg"
+import keyImage from "./assets/key.svg";
+import keyImagePressed from "./assets/key_light.svg";
+import scratchImage from "./assets/scratch.svg";
 
 const scratchAreaLeft = 0
 const scratchAreaTop = 0
