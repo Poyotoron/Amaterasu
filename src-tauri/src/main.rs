@@ -3,7 +3,7 @@
 
 use std::thread;
 use std::time::Duration;
-use std::{process::exit, sync::mpsc};
+// use std::{process::exit, sync::mpsc};
 
 use tauri::Manager;
 use windows::Gaming::Input::{GameControllerSwitchPosition, RawGameController};

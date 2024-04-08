@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { invoke } from "@tauri-apps/api/tauri";
+// import { invoke } from "@tauri-apps/api/tauri";
 import "./App.css";
 import { listen } from "@tauri-apps/api/event";
 
@@ -16,15 +16,15 @@ const scratchImageHeight = 350
 
 const keyAreaLeft = 400
 const keyAreaTop = 0
-const keyAreaWidth = 600
-const keyAreaHeight = 400
+// const keyAreaWidth = 600
+// const keyAreaHeight = 400
 const keyImageWidth = 80
 const keyImageHeight = 150
 
 const statAreaLeft = 1000
 const statAreaTop = 0
-const statAreaWidth = 400
-const statAreaHeight = 400
+// const statAreaWidth = 400
+// const statAreaHeight = 400
 
 function App() {
   const [keyStates, setKeyStates] = useState([false, false, false, false, false, false, false]);
@@ -34,7 +34,7 @@ function App() {
   const [scratchCount, setScratchCount] = useState(0);
 
   function createKeyStyle(keyNum: number) {
-    var index = keyNum / 2;
+    // var index = keyNum / 2;
     var isWhite = keyNum % 2 == 1;
 
     return {
