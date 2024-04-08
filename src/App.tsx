@@ -111,10 +111,11 @@ function App() {
       }
 
       return (
-        <div style={{ position: "absolute", left: statAreaLeft, top: statAreaTop }}>
-          <p>Key Count: <ol>{keyCountViews}</ol></p>
-          <p>Key Count Total: {keyCountSum}</p>
-          <p>Scratch Count: {scratchCount}</p>
+        <div style={{ position: "absolute", left: statAreaLeft, top: statAreaTop, fontSize: 48 }}>
+          <p>Key Count:</p>
+          <p style={{ textAlign: "center" }}>{keyCountSum}</p>
+          <p>Scratch Count:</p>
+          <p style={{ textAlign: "center" }}>{scratchCount}</p>
         </div>
       );
     }
