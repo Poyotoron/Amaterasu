@@ -21,9 +21,17 @@ const keyAreaHeight = 400
 const keyImageWidth = 80
 const keyImageHeight = 150
 
+const statAreaLeft = 1000
+const statAreaTop = 0
+const statAreaWidth = 400
+const statAreaHeight = 400
+
 function App() {
   const [keyStates, setKeyStates] = useState([false, false, false, false, false, false, false]);
+  const [keyCounts, setKeyCounts] = useState([0, 0, 0, 0, 0, 0, 0]);
+
   const [scratchState, setScratchState] = useState(0.0);
+  const [scratchCount, setScratchCount] = useState(0);
 
   function createKeyStyle(keyNum: number) {
     var index = keyNum / 2;
@@ -93,9 +101,31 @@ function App() {
     }
   }
 
+  class StatArea extends React.Component {
+    render() {
+      const keyCountViews = [];
+      let keyCountSum = 0;
+      for (var i = 0; i < 7; i++) {
+        keyCountViews.push(<li>{keyCounts[i]}</li>);
+        keyCountSum += keyCounts[i];
+      }
+
+      return (
+        <div style={{ position: "absolute", left: statAreaLeft, top: statAreaTop, fontSize: 48 }}>
+          <p>Key Count:</p>
+          <p style={{ textAlign: "center" }}>{keyCountSum}</p>
+          <p>Scratch Count:</p>
+          <p style={{ textAlign: "center" }}>{scratchCount}</p>
+        </div>
+      );
+    }
+  }
+
   useEffect(() => {
     let listenButtonState: any;
+    let listenButtonCounter: any;
     let listenScratchState: any;
+    let listenScratchCount: any;
 
     async function f() {
       listenButtonState = await listen("buttonState", event => {
@@ -103,9 +133,19 @@ function App() {
         setKeyStates(event.payload as boolean[]);
       });
 
+      listenButtonCounter = await listen("buttonCounter", event => {
+        console.log(event.payload);
+        setKeyCounts(event.payload as number[]);
+      });
+
       listenScratchState = await listen("scratchState", event => {
         console.log(event.payload);
         setScratchState(event.payload as number);
+      });
+
+      listenScratchCount = await listen("scratchCount", event => {
+        console.log(event.payload);
+        setScratchCount(event.payload as number);
       });
     }
     f();
@@ -115,15 +155,23 @@ function App() {
         listenButtonState();
       }
 
+      if (listenButtonCounter) {
+        listenButtonCounter();
+      }
+
       if (listenScratchState) {
         listenScratchState();
+      }
+
+      if (listenScratchCount) {
+        listenScratchCount();
       }
     }
   }, []);
 
   return (
     <>
-      <ScratchArea /><KeyArea />
+      <ScratchArea /><KeyArea /><StatArea />
     </>
   );
 }
