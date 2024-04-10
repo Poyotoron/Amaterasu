@@ -37,6 +37,10 @@ struct Scratch {
     prev_dir: bool,
     // 停止検知カウンタ
     counter: i32,
+    // カウンタのリミット
+    counter_limit: i32,
+    // 初期化フラグ
+    initialized: bool,
 }
 
 impl Scratch {
@@ -46,7 +50,9 @@ impl Scratch {
             prev_value: 0.0,
             prev_active: false,
             prev_dir: false,
-            counter: 500,
+            counter: 0,
+            counter_limit: 100,
+            initialized: false,
         }
     }
 
@@ -57,7 +63,13 @@ impl Scratch {
 
         let mut scratch_started = false;
 
-        if self.prev_value != scratch_value {
+        if !self.initialized {
+            self.prev_value = scratch_value;
+            self.initialized = true;
+            return false;
+        }
+
+        if scratch_value != self.prev_value {
             scratch_active = true;
             self.counter = 0;
 
@@ -78,7 +90,7 @@ impl Scratch {
         } else {
             self.counter += 1;
 
-            if self.counter > 50 {
+            if self.counter > self.counter_limit {
                 scratch_active = false;
             }
         }
@@ -162,7 +174,7 @@ fn main() {
 
                     prev_button_state.copy_from_slice(button_state);
 
-                    thread::sleep(Duration::from_micros(100));
+                    thread::sleep(Duration::from_micros(500));
                 }
             });
 
