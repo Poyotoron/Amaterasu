@@ -129,6 +129,9 @@ fn main() {
                 let mut button_counts = [0; 7];
                 let mut scratch_count = 0;
 
+                let mut is_pause = false;
+                let mut is_pause_toggled = false;
+
                 loop {
                     let _buttons = RawGameController::GetCurrentReading(
                         &controller,
@@ -143,23 +146,31 @@ fn main() {
                         .emit_all("buttonState", &button_state[0..7])
                         .unwrap();
 
-                    // 押下されたボタンをViewに送る
-                    for i in 0..button_counts.len() {
-                        if button_state[i] && !prev_button_state[i] {
-                            button_counts[i] += 1;
+                    if !is_pause {
+                        // 押下されたボタンをViewに送る
+                        for i in 0..button_counts.len() {
+                            if button_state[i] && !prev_button_state[i] {
+                                button_counts[i] += 1;
+                            }
                         }
-                    }
 
-                    app_handle
-                        .emit_all("buttonCounter", &button_counts)
-                        .unwrap();
+                        // ボタンのカウントをViewに送る
+                        app_handle
+                            .emit_all("buttonCounter", &button_counts)
+                            .unwrap();
+                    }
 
                     // スクラッチの状態をViewに送る
                     app_handle.emit_all("scratchState", &axis_state[0]).unwrap();
 
-                    // スクラッチが回転開始の場合Viewに送る
-                    if scratch.check_input(axis_state[0] as f32) {
-                        scratch_count += 1;
+                    if !is_pause {
+                        // スクラッチが回転開始の場合Viewに送る
+                        if scratch.check_input(axis_state[0] as f32) {
+                            scratch_count += 1;
+                        }
+
+                        // スクラッチのカウントをViewに送る
+                        app_handle.emit_all("scratchCount", scratch_count).unwrap();
                     }
 
                     // E1 + E4でリセット
@@ -170,7 +181,16 @@ fn main() {
                         scratch_count = 0;
                     }
 
-                    app_handle.emit_all("scratchCount", scratch_count).unwrap();
+                    // E3 + E4でポーズ(カウントを増やさない)
+                    if button_state[10] && button_state[11] {
+                        if !is_pause_toggled {
+                            is_pause = !is_pause;
+                            is_pause_toggled = true;
+                            app_handle.emit_all("togglePause", is_pause).unwrap();
+                        }
+                    } else {
+                        is_pause_toggled = false;
+                    }
 
                     prev_button_state.copy_from_slice(button_state);
 
