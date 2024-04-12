@@ -2,10 +2,39 @@
 
 beatmania IIDX INFINITAS向けのキーロガー & キーカウンター
 
-# Tauri + React + Typescript
+現状SPの1Pサイドのみ対応
 
-This template should help get you started developing with Tauri, React and Typescript in Vite.
+## インストール方法
+[Release](https://github.com/Poyotoron/Amaterasu/releases/latest)からexeかmsiをダウンロード後、インストーラーを起動してインストールする。
 
-## Recommended IDE Setup
+## 起動方法
+インストール後、スタートメニュー(指定した場合デスクトップにも)にAmaterasuのショートカットが作成されているのでそこから起動する。
 
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+起動しても目当てのコントローラーの入力を受け付けない場合、他のコントローラーを外す。
+
+## 操作方法
+起動するだけで特別な操作無しでカウントは開始される。
+
+- E1 + E4: カウントリセット
+- E3 + E4: ポーズ切り替え(ポーズ中はカウントの文字が赤くなり、入力してもカウントが増えなくなる)
+
+## アンイストール方法
+以下のどちらかの方法でアンインストールできる。
+
+- 設定アプリ → アプリ → インストールされているアプリ → 「amaterasu」右の三点リーダーボタン → アンインストール
+- コントロールパネル → プログラムのアンインストール → 「amaterasu」を選択して上の「アンインストール」
+
+## 今後実装予定の機能
+
+### 優先度高め
+- 2P対応
+- csv出力機能(本家IIDXタワー風)
+
+### やれたらやりたい
+- DP対応
+- スキンカスタマイズ
+- コントローラー切り替え機能
+
+## 問い合わせ先
+- [Issues](https://github.com/Poyotoron/Amaterasu/issues)
+- [作者Twitter](https://twitter.com/PyTr_N)

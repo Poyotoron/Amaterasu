@@ -33,6 +33,8 @@ function App() {
   const [scratchState, setScratchState] = useState(0.0);
   const [scratchCount, setScratchCount] = useState(0);
 
+  const [isPaused, setIsPaused] = useState(false);
+
   function createKeyStyle(keyNum: number) {
     // var index = keyNum / 2;
     var isWhite = keyNum % 2 == 1;
@@ -111,11 +113,19 @@ function App() {
       }
 
       return (
-        <div style={{ position: "absolute", left: statAreaLeft, top: statAreaTop, fontSize: 48 }}>
-          <p>Key Count:</p>
-          <p style={{ textAlign: "center" }}>{keyCountSum}</p>
-          <p>Scratch Count:</p>
-          <p style={{ textAlign: "center" }}>{scratchCount}</p>
+        <div>
+          <div style={{ position: "absolute", left: statAreaLeft, top: statAreaTop, fontSize: 40 }}>
+            <p>Key Count:</p>
+            <p style={{ textAlign: "center", color: isPaused ? "red" : "black" }}>{keyCountSum}</p>
+            <p>Scratch Count:</p>
+            <p style={{ textAlign: "center", color: isPaused ? "red" : "black" }}>{scratchCount}</p>
+          </div>
+          <div style={{ position: "absolute", left: statAreaLeft, top: statAreaTop + 260, fontSize: 24 }}>
+            <ul>
+              <li>E1 + E4: Reset count</li>
+              <li>E3 + E4: Toggle pause</li>
+            </ul>
+          </div>
         </div>
       );
     }
@@ -126,8 +136,9 @@ function App() {
     let listenButtonCounter: any;
     let listenScratchState: any;
     let listenScratchCount: any;
+    let listenTogglePause: any;
 
-    async function f() {
+    async function addListener() {
       listenButtonState = await listen("buttonState", event => {
         console.log(event.payload);
         setKeyStates(event.payload as boolean[]);
@@ -147,8 +158,13 @@ function App() {
         console.log(event.payload);
         setScratchCount(event.payload as number);
       });
+
+      listenTogglePause = await listen("togglePause", event => {
+        console.log(event.payload);
+        setIsPaused(event.payload as boolean);
+      });
     }
-    f();
+    addListener();
 
     return () => {
       if (listenButtonState) {
@@ -165,6 +181,10 @@ function App() {
 
       if (listenScratchCount) {
         listenScratchCount();
+      }
+
+      if (listenTogglePause) {
+        listenTogglePause();
       }
     }
   }, []);
