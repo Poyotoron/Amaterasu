@@ -163,15 +163,15 @@ fn main() {
                     // スクラッチの状態をViewに送る
                     app_handle.emit_all("scratchState", &axis_state[0]).unwrap();
 
-                    if !is_pause {
-                        // スクラッチが回転開始の場合Viewに送る
-                        if scratch.check_input(axis_state[0] as f32) {
+                    // スクラッチが回転開始の場合Viewに送る
+                    if scratch.check_input(axis_state[0] as f32) {
+                        if !is_pause {
                             scratch_count += 1;
                         }
-
-                        // スクラッチのカウントをViewに送る
-                        app_handle.emit_all("scratchCount", scratch_count).unwrap();
                     }
+
+                    // スクラッチのカウントをViewに送る
+                    app_handle.emit_all("scratchCount", scratch_count).unwrap();
 
                     // E1 + E4でリセット
                     if button_state[8] && button_state[11] {
