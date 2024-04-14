@@ -11,6 +11,9 @@ fn controller_loop(app_handle: &AppHandle) {
     let mut controller = controller::Controller::new();
     controller.connect_wait(0);
 
+    // リセットフラグ
+    let mut is_reset_pressed = false;
+
     // ポーズフラグ
     let mut is_pause = false;
     let mut is_pause_toggled = false;
@@ -19,29 +22,44 @@ fn controller_loop(app_handle: &AppHandle) {
     let mut is_2p = false;
     let mut is_2p_toggled = false;
 
+    // スクラッチ状態の送信間隔
+    let scratch_send_interval = 40;
+    let mut scratch_send_counter = 0;
+
     // メインループ
     loop {
         // コントローラーの状態を更新
         controller.update_state();
 
+        scratch_send_counter += 1;
+
         // コントローラーの状態をViewに送信
-        app_handle
-            .emit_all("buttonState", controller.get_button_state())
-            .expect("failed to send controller button state");
-        app_handle
-            .emit_all("scratchState", controller.get_scratch_state())
-            .expect("failed to send controller scratch state");
+        if controller.get_button_diff() {
+            app_handle
+                .emit_all("buttonState", controller.get_button_state())
+                .expect("failed to send controller button state");
+        }
+        if scratch_send_counter >= scratch_send_interval {
+            app_handle
+                .emit_all("scratchState", controller.get_scratch_state())
+                .expect("failed to send controller scratch state");
+            scratch_send_counter = 0;
+        }
 
         // 非ポーズ中のみカウントの更新と送信を行う
         if !is_pause {
             controller.update_count();
 
-            app_handle
-                .emit_all("buttonCounter", controller.get_button_count())
-                .unwrap();
-            app_handle
-                .emit_all("scratchCount", controller.get_scratch_count())
-                .unwrap();
+            if controller.get_button_count_diff() {
+                app_handle
+                    .emit_all("buttonCounter", controller.get_button_count())
+                    .unwrap();
+            }
+            if controller.get_scratch_count_diff() {
+                app_handle
+                    .emit_all("scratchCount", controller.get_scratch_count())
+                    .unwrap();
+            }
         }
 
         // E1 + E4でカウントのリセット
@@ -49,7 +67,18 @@ fn controller_loop(app_handle: &AppHandle) {
             controller::Button::KEYE1 as i32,
             controller::Button::KEYE4 as i32,
         ]) {
-            controller.reset_count();
+            if !is_reset_pressed {
+                controller.reset_count();
+                app_handle
+                    .emit_all("buttonCounter", controller.get_button_count())
+                    .unwrap();
+                app_handle
+                    .emit_all("scratchCount", controller.get_scratch_count())
+                    .unwrap();
+                is_reset_pressed = true;
+            }
+        } else {
+            is_reset_pressed = false;
         }
 
         // E3 + E4でポーズのトグル
