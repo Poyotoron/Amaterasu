@@ -23,10 +23,14 @@ pub struct Controller {
     button_state: Vec<bool>,
     button_pressed: Vec<bool>,
     button_count: [i32; 7],
+    button_diff: bool,
+    button_count_diff: bool,
     scratch: scratch::Scratch,
     scratch_state: f64,
     scratch_activated: bool,
     scratch_count: i32,
+    scratch_diff: bool,
+    scratch_count_diff: bool,
 }
 
 impl Controller {
@@ -38,10 +42,14 @@ impl Controller {
             button_state: vec![false; 16],
             button_pressed: vec![false; 16],
             button_count: [0; 7],
+            button_diff: false,
+            button_count_diff: false,
             scratch: scratch::Scratch::new(),
             scratch_state: 0.0,
             scratch_activated: false,
             scratch_count: 0,
+            scratch_diff: false,
+            scratch_count_diff: false,
         }
     }
 
@@ -97,8 +105,9 @@ impl Controller {
         self.scratch_state = axisarray[0];
 
         // ボタン・スクラッチの作動状態を更新
-        self.button_pressed = self.button.check_pressed(self.button_state.clone());
-        self.scratch_activated = self.scratch.check_input(self.scratch_state);
+        (self.button_pressed, self.button_diff) =
+            self.button.check_pressed(self.button_state.clone());
+        (self.scratch_activated, self.scratch_diff) = self.scratch.check_input(self.scratch_state);
     }
 
     pub fn get_button_count(&self) -> [i32; 7] {
@@ -110,16 +119,21 @@ impl Controller {
     }
 
     pub fn update_count(&mut self) -> () {
+        self.button_count_diff = false;
+        self.scratch_count_diff = false;
+
         // ボタンカウントの更新
         for i in 0..7 {
             if self.button_pressed[i] {
                 self.button_count[i] += 1;
+                self.button_count_diff = true;
             }
         }
 
         // スクラッチカウントの更新
         if self.scratch_activated {
             self.scratch_count += 1;
+            self.scratch_count_diff = true;
         }
     }
 
@@ -145,5 +159,21 @@ impl Controller {
             }
         }
         true
+    }
+
+    pub fn get_button_diff(&self) -> bool {
+        self.button_diff
+    }
+
+    pub fn get_button_count_diff(&self) -> bool {
+        self.button_count_diff
+    }
+
+    pub fn get_scratch_diff(&self) -> bool {
+        self.scratch_diff
+    }
+
+    pub fn get_scratch_count_diff(&self) -> bool {
+        self.scratch_count_diff
     }
 }
