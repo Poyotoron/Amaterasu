@@ -27,21 +27,24 @@ impl Scratch {
         }
     }
 
-    pub fn check_input(&mut self, value: f64) -> bool {
+    pub fn check_input(&mut self, value: f64) -> (bool, bool) {
         let scratch_value: f64 = value;
         let mut scratch_active = self.prev_active;
         let mut scratch_dir = self.prev_dir;
 
         let mut scratch_started = false;
 
+        let mut scratch_diff = false;
+
         if !self.initialized {
             self.prev_value = scratch_value;
             self.initialized = true;
-            return false;
+            return (false, true);
         }
 
         if scratch_value != self.prev_value {
             scratch_active = true;
+            scratch_diff = true;
             self.counter = 0;
 
             let scratch_diff = scratch_value - self.prev_value;
@@ -74,6 +77,6 @@ impl Scratch {
         self.prev_active = scratch_active;
         self.prev_dir = scratch_dir;
 
-        return scratch_started;
+        return (scratch_started, scratch_diff);
     }
 }
