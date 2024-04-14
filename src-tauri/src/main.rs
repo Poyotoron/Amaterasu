@@ -15,6 +15,10 @@ fn controller_loop(app_handle: &AppHandle) {
     let mut is_pause = false;
     let mut is_pause_toggled = false;
 
+    // 2Pフラグ
+    let mut is_2p = false;
+    let mut is_2p_toggled = false;
+
     // メインループ
     loop {
         // コントローラーの状態を更新
@@ -60,6 +64,21 @@ fn controller_loop(app_handle: &AppHandle) {
             }
         } else {
             is_pause_toggled = false;
+        }
+
+        // E2 + 2 + 6でプレイサイドのトグル
+        if controller.button_pressed_all(vec![
+            controller::Button::KEYE2 as i32,
+            controller::Button::KEY2 as i32,
+            controller::Button::KEY6 as i32,
+        ]) {
+            if !is_2p_toggled {
+                is_2p = !is_2p;
+                is_2p_toggled = true;
+                app_handle.emit_all("toggle2P", is_2p).unwrap();
+            }
+        } else {
+            is_2p_toggled = false;
         }
 
         // 500us待機

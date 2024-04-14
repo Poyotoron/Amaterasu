@@ -7,26 +7,8 @@ import keyImage from "./assets/key.svg";
 import keyImagePressed from "./assets/key_light.svg";
 import scratchImage from "./assets/scratch.svg";
 
-const scratchAreaLeft = 0
-const scratchAreaTop = 0
-const scratchAreaWidth = 400
-const scratchAreaHeight = 400
-const scratchImageWidth = 350
-const scratchImageHeight = 350
-
-const keyAreaLeft = 400
-const keyAreaTop = 0
-// const keyAreaWidth = 600
-// const keyAreaHeight = 400
-const keyImageWidth = 80
-const keyImageHeight = 150
-
-const statAreaLeft = 1000
-const statAreaTop = 0
-// const statAreaWidth = 400
-// const statAreaHeight = 400
-
 function App() {
+
   const [keyStates, setKeyStates] = useState([false, false, false, false, false, false, false]);
   const [keyCounts, setKeyCounts] = useState([0, 0, 0, 0, 0, 0, 0]);
 
@@ -34,6 +16,26 @@ function App() {
   const [scratchCount, setScratchCount] = useState(0);
 
   const [isPaused, setIsPaused] = useState(false);
+  const [is2P, setIs2P] = useState(false);
+
+  const scratchAreaLeft = !is2P ? 0 : 1000;
+  const scratchAreaTop = 0
+  const scratchAreaWidth = 400
+  const scratchAreaHeight = 400
+  const scratchImageWidth = 350
+  const scratchImageHeight = 350
+
+  const keyAreaLeft = 400
+  const keyAreaTop = 0
+  // const keyAreaWidth = 600
+  // const keyAreaHeight = 400
+  const keyImageWidth = 80
+  const keyImageHeight = 150
+
+  const statAreaLeft = !is2P ? 1000 : 0;
+  const statAreaTop = 0
+  // const statAreaWidth = 400
+  // const statAreaHeight = 400
 
   function createKeyStyle(keyNum: number) {
     // var index = keyNum / 2;
@@ -114,16 +116,17 @@ function App() {
 
       return (
         <div>
-          <div style={{ position: "absolute", left: statAreaLeft, top: statAreaTop, fontSize: 40 }}>
+          <div style={{ position: "absolute", left: statAreaLeft + 40, top: statAreaTop, fontSize: 40 }}>
             <p>Key Count:</p>
             <p style={{ textAlign: "center", color: isPaused ? "red" : "black" }}>{keyCountSum}</p>
             <p>Scratch Count:</p>
             <p style={{ textAlign: "center", color: isPaused ? "red" : "black" }}>{scratchCount}</p>
           </div>
-          <div style={{ position: "absolute", left: statAreaLeft, top: statAreaTop + 260, fontSize: 24 }}>
+          <div style={{ position: "absolute", left: statAreaLeft + 40, top: statAreaTop + 260, fontSize: 20 }}>
             <ul>
-              <li>E1 + E4: Reset count</li>
+              <li>E2 + 2 + 6: Change playside</li>
               <li>E3 + E4: Toggle pause</li>
+              <li>E1 + E4: Reset count</li>
             </ul>
           </div>
         </div>
@@ -137,6 +140,7 @@ function App() {
     let listenScratchState: any;
     let listenScratchCount: any;
     let listenTogglePause: any;
+    let listenToggle2P: any;
 
     async function addListener() {
       listenButtonState = await listen("buttonState", event => {
@@ -163,6 +167,11 @@ function App() {
         console.log(event.payload);
         setIsPaused(event.payload as boolean);
       });
+
+      listenToggle2P = await listen("toggle2P", event => {
+        console.log(event.payload);
+        setIs2P(event.payload as boolean);
+      });
     }
     addListener();
 
@@ -185,6 +194,10 @@ function App() {
 
       if (listenTogglePause) {
         listenTogglePause();
+      }
+
+      if (listenToggle2P) {
+        listenToggle2P();
       }
     }
   }, []);
