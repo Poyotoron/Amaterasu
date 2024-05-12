@@ -1,3 +1,7 @@
+use std::{iter::Sum, path::Path};
+
+use chrono::Utc;
+
 use windows::Gaming::Input::{GameControllerSwitchPosition, RawGameController};
 
 mod button;
@@ -19,6 +23,8 @@ pub enum Button {
 
 pub struct Controller {
     controller: Option<RawGameController>,
+    date_id: String,
+    csv_name: String,
     button: button::Button,
     button_state: Vec<bool>,
     button_pressed: Vec<bool>,
@@ -38,6 +44,8 @@ impl Controller {
         // コンストラクタ
         Self {
             controller: None,
+            date_id: Utc::now().format("%F").to_string(),
+            csv_name: "key_counter.csv".to_string(),
             button: button::Button::new(),
             button_state: vec![false; 16],
             button_pressed: vec![false; 16],
@@ -78,6 +86,11 @@ impl Controller {
         }
     }
 
+    pub fn init(&mut self) -> () {
+        // 初期化
+        self.init_count();
+    }
+
     pub fn get_button_state(&self) -> Vec<bool> {
         self.button_state.clone()
     }
@@ -108,6 +121,108 @@ impl Controller {
         (self.button_pressed, self.button_diff) =
             self.button.check_pressed(self.button_state.clone());
         (self.scratch_activated, self.scratch_diff) = self.scratch.check_input(self.scratch_state);
+    }
+
+    pub fn init_count(&mut self) -> () {
+        if Path::new(&self.csv_name).exists() {
+            // ファイルが存在する場合は読み込み
+            let mut rdr = csv::Reader::from_path(&self.csv_name).unwrap();
+            let mut last_row = None;
+            for record in rdr.records() {
+                last_row = record.ok();
+            }
+
+            if let Some(row) = last_row {
+                if row[0] == self.date_id {
+                    self.button_count = [
+                        row[1].parse::<i32>().unwrap(),
+                        row[2].parse::<i32>().unwrap(),
+                        row[3].parse::<i32>().unwrap(),
+                        row[4].parse::<i32>().unwrap(),
+                        row[5].parse::<i32>().unwrap(),
+                        row[6].parse::<i32>().unwrap(),
+                        row[7].parse::<i32>().unwrap(),
+                    ];
+                    self.scratch_count = row[9].parse::<i32>().unwrap();
+                }
+            }
+        }
+    }
+
+    pub fn save_count(&mut self) -> () {
+        // カウントの保存
+        // 最終行とdate_idが一致する場合は上書き、一致しない場合は追記
+        if Path::new(&self.csv_name).exists() {
+            let mut rdr = csv::Reader::from_path(&self.csv_name).unwrap();
+            let csv_data = rdr.records().collect::<Vec<_>>();
+
+            let mut wtr = csv::Writer::from_path(&self.csv_name).unwrap();
+            wtr.write_record(&[
+                "date_id",
+                "key1",
+                "key2",
+                "key3",
+                "key4",
+                "key5",
+                "key6",
+                "key7",
+                "key_total",
+                "scratch",
+            ])
+            .unwrap();
+
+            for record in csv_data {
+                let r = record.unwrap();
+                if r[0] != self.date_id {
+                    wtr.write_record(&r).unwrap();
+                }
+            }
+
+            wtr.write_record(&[
+                &self.date_id,
+                &self.button_count[0].to_string(),
+                &self.button_count[1].to_string(),
+                &self.button_count[2].to_string(),
+                &self.button_count[3].to_string(),
+                &self.button_count[4].to_string(),
+                &self.button_count[5].to_string(),
+                &self.button_count[6].to_string(),
+                &self.button_count.iter().sum::<i32>().to_string(),
+                &self.scratch_count.to_string(),
+            ])
+            .unwrap();
+
+            wtr.flush().unwrap();
+        } else {
+            let mut wtr = csv::Writer::from_path(&self.csv_name).unwrap();
+            wtr.write_record(&[
+                "date_id",
+                "key1",
+                "key2",
+                "key3",
+                "key4",
+                "key5",
+                "key6",
+                "key7",
+                "key_total",
+                "scratch",
+            ])
+            .unwrap();
+            wtr.write_record(&[
+                &self.date_id,
+                &self.button_count[0].to_string(),
+                &self.button_count[1].to_string(),
+                &self.button_count[2].to_string(),
+                &self.button_count[3].to_string(),
+                &self.button_count[4].to_string(),
+                &self.button_count[5].to_string(),
+                &self.button_count[6].to_string(),
+                &self.button_count.iter().sum::<i32>().to_string(),
+                &self.scratch_count.to_string(),
+            ])
+            .unwrap();
+            wtr.flush().unwrap();
+        }
     }
 
     pub fn get_button_count(&self) -> [i32; 7] {
