@@ -124,6 +124,7 @@ function App() {
           </div>
           <div style={{ position: "absolute", left: statAreaLeft + 40, top: statAreaTop + 260, fontSize: 20 }}>
             <ul>
+              <li>E2 + 4: Save count</li>
               <li>E2 + 2 + 6: Change playside</li>
               <li>E3 + E4: Toggle pause</li>
               <li>E1 + E4: Reset count</li>

@@ -10,6 +10,7 @@ use tauri::{AppHandle, Manager};
 fn controller_loop(app_handle: &AppHandle) {
     let mut controller = controller::Controller::new();
     controller.connect_wait(0);
+    controller.init();
 
     // リセットフラグ
     let mut is_reset_pressed = false;
@@ -22,9 +23,20 @@ fn controller_loop(app_handle: &AppHandle) {
     let mut is_2p = false;
     let mut is_2p_toggled = false;
 
+    // セーブ
+    let mut is_save_pressed = false;
+
     // スクラッチ状態の送信間隔
     let scratch_send_interval = 40;
     let mut scratch_send_counter = 0;
+
+    // 初期カウントの送信
+    app_handle
+        .emit_all("buttonCounter", controller.get_button_count())
+        .unwrap();
+    app_handle
+        .emit_all("scratchCount", controller.get_scratch_count())
+        .unwrap();
 
     // メインループ
     loop {
@@ -108,6 +120,19 @@ fn controller_loop(app_handle: &AppHandle) {
             }
         } else {
             is_2p_toggled = false;
+        }
+
+        // E2 + 4でセーブ
+        if controller.button_pressed_all(vec![
+            controller::Button::KEYE2 as i32,
+            controller::Button::KEY4 as i32,
+        ]) {
+            if !is_save_pressed {
+                controller.save_count();
+                is_save_pressed = true;
+            }
+        } else {
+            is_save_pressed = false;
         }
 
         // 500us待機
