@@ -130,6 +130,7 @@ fn controller_loop(app_handle: &AppHandle) {
             if !is_save_pressed {
                 controller.save_count();
                 is_save_pressed = true;
+                app_handle.emit_all("savedCount", true).unwrap();
             }
         } else {
             is_save_pressed = false;

@@ -17,6 +17,7 @@ function App() {
 
   const [isPaused, setIsPaused] = useState(false);
   const [is2P, setIs2P] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
 
   const scratchAreaLeft = !is2P ? 0 : 1000;
   const scratchAreaTop = 0
@@ -118,9 +119,9 @@ function App() {
         <div>
           <div style={{ position: "absolute", left: statAreaLeft + 40, top: statAreaTop, fontSize: 40 }}>
             <p>Key Count:</p>
-            <p style={{ textAlign: "center", color: isPaused ? "red" : "black" }}>{keyCountSum}</p>
+            <p style={{ textAlign: "center", color: isSaved ? "blue" : isPaused ? "red" : "black" }}>{keyCountSum}</p>
             <p>Scratch Count:</p>
-            <p style={{ textAlign: "center", color: isPaused ? "red" : "black" }}>{scratchCount}</p>
+            <p style={{ textAlign: "center", color: isSaved ? "blue" : isPaused ? "red" : "black" }}>{scratchCount}</p>
           </div>
           <div style={{ position: "absolute", left: statAreaLeft + 40, top: statAreaTop + 260, fontSize: 20 }}>
             <ul>
@@ -142,6 +143,7 @@ function App() {
     let listenScratchCount: any;
     let listenTogglePause: any;
     let listenToggle2P: any;
+    let listenSavedCount: any;
 
     async function addListener() {
       listenButtonState = await listen("buttonState", event => {
@@ -173,6 +175,14 @@ function App() {
         console.log(event.payload);
         setIs2P(event.payload as boolean);
       });
+
+      listenSavedCount = await listen("savedCount", event => {
+        console.log(event.payload);
+        setIsSaved(true);
+        setTimeout(() => {
+          setIsSaved(false);
+        }, 3000);
+      });
     }
     addListener();
 
@@ -199,6 +209,10 @@ function App() {
 
       if (listenToggle2P) {
         listenToggle2P();
+      }
+
+      if (listenSavedCount) {
+        listenSavedCount();
       }
     }
   }, []);
