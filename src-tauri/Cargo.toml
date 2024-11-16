@@ -1,6 +1,6 @@
 [package]
 name = "amaterasu"
-version = "0.4.1"
+version = "0.5.0"
 description = "IIDX key counter app"
 authors = ["you"]
 edition = "2021"
