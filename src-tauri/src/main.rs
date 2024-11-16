@@ -143,6 +143,7 @@ fn controller_loop(app_handle: &AppHandle) {
 
 fn main() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_shell::init())
         .setup(|app| {
             // Rust→Viewの通信用ハンドル
             let app_handle = app.app_handle();
